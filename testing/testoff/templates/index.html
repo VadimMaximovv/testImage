@@ -1,0 +1,42 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'main.css' %}">
+</head>
+<body>
+<header>
+  <div class="main-heading">
+    <h1><span>Emotion detector</span></h1>
+    <p>Upload a photo and we will recognize an emotion on it</p>
+  </div>
+  </header>
+</header>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <p><label for="id_title">   </label><div class="input-wrapper"><input placeholder="Come up with a picture name" type="text" name="title" maxlength="200" required id="id_title"></div></p>
+    <p><label for="id_image"></label><div><input title="Browse..." class="input-file" type="file" name="image" accept="image/*" id="id_image"></div></p>
+    <button class="bot1" type="submit">Upload</button>
+  </form>
+  {% if img_obj %}
+<div class="uploaded">
+  <h3 class="uploaded-text">Succesfully uploaded : {{img_obj.title}}</h3>
+    <div style="padding-left:40%">
+    <img src="{{ img_obj.image.url}}" alt="connect" class="foto-demonstration" style="height:300px; width: 300px; margin-left: auto; margin-right: auto;">
+  </div>
+        {% endif %}
+<div>
+        {% if answer %}
+        <div>
+            <p class="uploaded-text"><output>{{answer}}</output></p>
+        </div>
+        {% endif%}
+    </div>
+    </div>
+</body>
+</html>
