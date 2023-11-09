@@ -82,16 +82,27 @@ Django был выбран по следующим критериям:
 Для обработки будет использоваться библиотека работы с изображениями для языка программирования Python Open-CV.
 ### 3.2 Описание программной реализации 
 Проект использует структуру проекта Django. С помощью единственного приложения можно загрузить изображения, программа его обрабатывает и выводит web-страницу. Проект использует локальную сеть. Для запуска программы необходимо:
-1.	Перейти в папку проекта через консоль.
-2.	Подключить виртуальную среду.
+1.	Перейти в [папку проекта](/testing) через консоль (комманда сd [путь к проекту]).
+2.	Подключить виртуальную среду
+~~~
+venv/scripts/activate
+~~~
 3.	Переёти папку проекта Django
+~~~
 cd testing
+~~~
 4.	 Запустить локальный сервер
+~~~
 python manage.py runserver
+~~~
 Приложение имеет слудущю структуру:
+
 •	models.py – создаёт структуру проекта Django, в которой сохраняется название изображения и само изображения. Все данные, которые были сохранены во время работы локального сервера, удаляются после его отключения.
+
 •	form.py – создаёт форму для сохранения данных в модель.
+
 •	views.py – в ней происходит все основные действия:
+
 Функция prepare принимает в кацестве единтвенного параметра путь к сохраненому файлу. Она преобразует изображение в матрицу и сохраняет его в переменную.
 Функция image_upload_view позволяет загрузить и сохранить через форму изображение. Затем загруженное изображение обрабатывается с помощью функции prepare и проходит через заранее обученную модель.  Затем результат сохраняется в словарь и загружается на web-страницу. В словаре хранится: название изображения, само изображение и результат распознаной эмоции.
 
@@ -100,66 +111,6 @@ python manage.py runserver
 Получены и закреплены навыки работы с моделями: выбор, реализация, обучение, тестирование и возможность применения для решения практических задач.
 Кроме этого, отработаны навыки формирования датасета и оценки возможности его использования для обучения моделей.
 Перечень использованных информационных ресурсов
-1.	Ссылка на тренировочный датасет https://www.kaggle.com/datasets/ananthu017/emotion-detection-fer
-2. Сcылка к документации Django https://docs.djangoproject.com/en/4.2/ 
-3. Ссылка на тренирвочную программу для модели нейросети https://drive.google.com/file/d/1H7RrnSWBd5W0aZKeA3InBjl_UA9HK4Ca/view?usp=sharing
-
- 
-# Приложение А Листинг программы
-## 1. views.py
-    from django.shortcuts import render
-    from .forms import ImageForm
-    import numpy as np
-    import tensorflow as tf
-    import keras.utils as image
-    import cv2
-    
-    def prepare(filepath):
-        IMG_SIZE = 48
-        img_array = cv2.imread(filepath)
-        new_array = cv2.resize(img_array, (IMG_SIZE, IMG_SIZE))
-        new_array = new_array.reshape(-1, IMG_SIZE, IMG_SIZE, 3)
-        new_array = new_array.astype("float") / 255.0
-        return new_array
-    
-    def image_upload_view(request):
-        """Process images uploaded by users"""
-        if request.method == 'POST':
-            form = ImageForm(request.POST, request.FILES)
-            if form.is_valid():
-                form.save()
-                # Get the current instance object to display in the template
-                img_obj = form.instance
-                asd = str(request.FILES)[51:-16]
-    
-                model = tf.keras.models.load_model('./models/emotion_detection.h5')
-                CATEGORIES = ['angry', 'disgusted', 'fearful', 'happy', 'neutral', 'sad', 'surprised']
-                prediction = model.predict([prepare("./media/images/" + asd)])
-                #prediction  # will be a list in a list.
-                score = tf.nn.softmax(prediction[0])
-                answer = "This image most likely belongs to {} with a {:.2f} percent confidence.".format(CATEGORIES[np.argmax(score)], 100 * np.max(score))
-                #return render(request, 'index.html', {'form': form, 'img_obj': img_obj})
-                return render(request, 'index.html', {'form': form, 'img_obj': img_obj, 'answer': answer})
-        else:
-            form = ImageForm()
-        return render(request, 'index.html', {'form': form})
-
-## 2. models.py
-    from django.db import models
-
-    class Image(models.Model):
-        title = models.CharField(max_length=200)
-        image = models.ImageField(upload_to='images')
-
-    def __str__(self):
-        return self.title
-## 3. forms.py
-    from django import forms
-    from .models import Image
-
-    class ImageForm(forms.ModelForm):
-        """Form for the image model"""
-        class Meta:
-            model = Image
-            fields = ('title', 'image')
-
+1.	[Ссылка на тренировочный датасет](https://www.kaggle.com/datasets/ananthu017/emotion-detection-fer)
+2. [Сcылка к документации Django](https://docs.djangoproject.com/en/4.2/)
+3. [Ссылка на тренировочную программу для модели нейросети](https://drive.google.com/file/d/1H7RrnSWBd5W0aZKeA3InBjl_UA9HK4Ca/view?usp=sharing)
